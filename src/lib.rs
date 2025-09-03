@@ -37,7 +37,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! tokio-retry2 = "0.5"
+//! tokio-retry2 = "0.6"
 //! ```
 //!
 //! # Example
@@ -112,7 +112,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! tokio-retry2 = { version = "0.5", features = ["jitter"] }
+//! tokio-retry2 = { version = "6", features = ["jitter"] }
 //! ```
 //!
 //! # Example

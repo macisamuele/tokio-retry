@@ -16,7 +16,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-tokio-retry2 = { version = "0.5", features = ["jitter", "tracing"] }
+tokio-retry2 = { version = "0.6", features = ["jitter", "tracing"] }
 ```
 
 ### Features:
