@@ -2,7 +2,7 @@
 
 Forked from https://github.com/srijs/rust-tokio-retry to keep it up-to-date
 
-Extensible, asynchronous retry behaviours for the ecosystem of [tokio](https://tokio.rs/) libraries.
+Extensible, asynchronous retry behaviors for the ecosystem of [tokio](https://tokio.rs/) libraries.
 
 [![Crates.io](https://img.shields.io/crates/v/tokio-retry2.svg)](https://crates.io/crates/tokio-retry2)
 [![dependency status](https://deps.rs/repo/github/naomijub/tokio-retry/status.svg)](https://deps.rs/repo/github/namijub/tokio-retry)
@@ -16,8 +16,10 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-tokio-retry2 = { version = "0.6", features = ["jitter", "tracing"] }
+tokio-retry2 = { version = "0.7", features = ["jitter", "tracing"] }
 ```
+
+`MSRV = 1.88`
 
 ### Features:
 - `jitter`: adds jittery duration to the retry. Mechanism to avoid multiple systems retrying at the same time.
@@ -37,7 +39,7 @@ async fn action() -> Result<u64, RetryError<()>> {
 #[tokio::main]
 async fn main() -> Result<(), ()> {
     let retry_strategy = ExponentialBackoff::from_millis(10)
-        .factor(1) // multiplication factor applied to deplay
+        .factor(1) // multiplication factor applied to delay
         .max_delay_millis(100) // set max delay between retries to 500ms
         .max_interval(10000) // set max interval to 10 seconds
         .map(jitter) // add jitter to delays
@@ -67,7 +69,7 @@ fn notify(err: &std::io::Error, duration: std::time::Duration) {
 #[tokio::main]
 async fn main() -> Result<(), ()> {
     let retry_strategy = ExponentialBackoff::from_millis(10)
-        .factor(1) // multiplication factor applied to deplay
+        .factor(1) // multiplication factor applied to delay
         .max_delay_millis(100) // set max delay between retries to 500ms
         .max_interval(10000) // set max interval to 10 seconds
         .map(jitter) // add jitter to delays
@@ -81,12 +83,12 @@ async fn main() -> Result<(), ()> {
 
 ## Early Exit and Error Handling
 
-Actions must return a `RetryError` that can wrap any other error type. There are 2 `RetryError` error trypes:
+Actions must return a `RetryError` that can wrap any other error type. There are 2 `RetryError` error types:
 - `Permanent`, which receives an error and brakes the retry loop. It can be constructed manually or with auxiliary functions `RetryError::permanent(e: E)`, that returns a `RetryError::Permanent<E>`, or `RetryError::to_permanent(e: E)`, that returns an `Err(RetryError::Permanent<E>)`.
 - `Transient`, which is the **Default** error for the loop. It has 2 modes:
     1. `RetryError::transient(e: E)` and `RetryError::to_transient(e: E)`, that return a `RetryError::Transient<E>`, which is an error that triggers the retry strategy.
     2. `RetryError::retry_after(e: E, duration: std::time::Duration)` and `RetryError::to_retry_after(e: E, duration: std::time::Duration)`, that return a `RetryError::Transient<E>`, which is an error that triggers the retry strategy after the specified duration.
-- Thet is also the trait `MapErr` that possesses 2 auxiliary functions that map the current function Result to `Result<T, RetryError<E>>`:
+- There is also the trait `MapErr` that possesses 2 auxiliary functions that map the current function Result to `Result<T, RetryError<E>>`:
     1. `fn map_transient_err(self) -> Result<T, RetryError<E>>;`
     2. `fn map_permanent_err(self) -> Result<T, RetryError<E>>;`
 - Using the `?` operator on an `Option` type will always propagate a `RetryError::Transient<E>` with no extra duration.

@@ -1,8 +1,9 @@
 # Changelog
 
-## Version 0.6.1
+## Version 0.7.0
 
-- Internal change.
+- Breaking: Increased minimum required version to 1.88.
+- Internal API change.
 
 ## Version 0.6.0
 
