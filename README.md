@@ -21,6 +21,8 @@ tokio-retry2 = { version = "0.7", features = ["jitter", "tracing"] }
 
 `MSRV = 1.88`
 
+### For older version please refer to [v0.6](https://github.com/naomijub/tokio-retry/tree/v0.6)
+
 ### Features:
 - `jitter`: adds jittery duration to the retry. Mechanism to avoid multiple systems retrying at the same time.
 - `tracing`: using `tracing` crate to indicate that a strategy has reached its `max_duration` or `max_delay`.
