@@ -1,5 +1,13 @@
 # Changelog
 
+## Version 0.8.0 [#22](https://github.com/naomijub/tokio-retry/pull/22)
+
+- Implemented Notify for Box<dyn Notify> to support trait objects
+- Modified spawn_notify to accept generic Notify implementations
+- Added EmptyNotify for default no-op behavior
+- Exported Notify trait from library root
+- Tighten clippy behaviour [#23](https://github.com/naomijub/tokio-retry/pull/23)
+
 ## Version 0.7.0
 
 - Breaking: Increased minimum required version to 1.88.
