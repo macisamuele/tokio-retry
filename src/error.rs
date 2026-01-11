@@ -71,19 +71,29 @@ impl<E> Error<E> {
             retry_after: Some(duration),
         }
     }
+
+    /// Check if error is transient
+    pub const fn is_transient(&self) -> bool {
+        matches!(self, Self::Transient { .. })
+    }
+
+    /// Check if error is permanent
+    pub const fn is_permanent(&self) -> bool {
+        matches!(self, Self::Permanent(_))
+    }
 }
 
-impl<E> fmt::Display for Error<E>
-where
-    E: fmt::Display,
-{
-    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        match *self {
-            Self::Permanent(ref err)
-            | Self::Transient {
-                ref err,
-                retry_after: _,
-            } => err.fmt(f),
+impl<E: fmt::Display> fmt::Display for Error<E> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Transient { err, retry_after } => {
+                if let Some(duration) = retry_after {
+                    write!(f, "Transient error (retry after {duration:?}): {err}")
+                } else {
+                    write!(f, "Transient error: {err}")
+                }
+            }
+            Self::Permanent(error) => write!(f, "Permanent error: {error}"),
         }
     }
 }
@@ -318,8 +328,8 @@ mod test {
     #[test]
     fn fmt_permanent_error() {
         let error = Error::Permanent(PERMANENT_ERROR);
-        let formatted = format!("{error}");
-        assert_eq!(formatted, PERMANENT_ERROR);
+        let formatted = "Permanent error: permanent error";
+        assert_eq!(formatted, error.to_string());
     }
 
     #[test]
@@ -328,8 +338,18 @@ mod test {
             err: TRANSIENT_ERROR,
             retry_after: None,
         };
-        let formatted = format!("{error}");
-        assert_eq!(formatted, TRANSIENT_ERROR);
+        let formatted = "Transient error: transient error";
+        assert_eq!(formatted, error.to_string());
+    }
+
+    #[test]
+    fn fmt_transient_error_with_duration() {
+        let error = Error::Transient {
+            err: TRANSIENT_ERROR,
+            retry_after: Some(Duration::from_millis(100)),
+        };
+        let formatted = "Transient error (retry after 100ms): transient error";
+        assert_eq!(formatted, error.to_string());
     }
 
     #[test]
@@ -377,12 +397,14 @@ mod test {
     #[test]
     fn cause_permanent_error() {
         let error = Error::permanent(MyError(PERMANENT_ERROR));
+        assert!(error.is_permanent());
         assert!(error.cause().is_none());
     }
 
     #[test]
     fn cause_transient_error() {
         let error = Error::transient(MyError(TRANSIENT_ERROR));
+        assert!(error.is_transient());
         assert!(error.cause().is_none());
     }
 
